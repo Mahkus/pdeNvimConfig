@@ -18,7 +18,8 @@ return {
     },
 
     config = function()
-        local lspconfig = require("lspconfig")
+        local capabilities = require('blink.cmp').get_lsp_capabilities()
+        local lspconfig = require("lspconfig").lua_ls.setup { capabilities = capabilities }
         local mason = require("mason")
         local mason_lspconfig = require("mason-lspconfig")
         local mason_tool_installer = require("mason-tool-installer")
@@ -52,7 +53,7 @@ return {
 	        -- place other packages you want to install but not configure with mason here
             -- e.g. language servers not configured with nvim-lspconfig, linters, formatters, etc.
             {
-		        "stylua",
+                "stylua",
                 "pyright",
                 "pylint",
                 "black",
