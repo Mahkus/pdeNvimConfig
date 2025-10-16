@@ -1,25 +1,25 @@
+-- ~/.config/nvim/lua/plugins/lspconfig.lua
 return {
     "neovim/nvim-lspconfig",
     dependencies = {
         "williamboman/mason.nvim",
         "williamboman/mason-lspconfig.nvim",
-        "WhoIsSethDaniel/mason-tool-installer.nvim",
+        'WhoIsSethDaniel/mason-tool-installer.nvim',
         {
             "folke/lazydev.nvim",
             ft = "lua", -- only load on lua files
             opts = {
                 library = {
                     -- Load luvit types when the `vim.uv` word is found
-                    { path = "luvit-meta/lubrary", words = { "vim%.uv" } },
+                    { path = "luvit-meta/library", words = { "vim%.uv" } },
                 },
             },
         },
-        { "Bilal2453/luvit-meta", lazy = true },
+        "mfussenegger/nvim-jdtls",
     },
 
     config = function()
-        local capabilities = require('blink.cmp').get_lsp_capabilities()
-        local lspconfig = require("lspconfig").lua_ls.setup { capabilities = capabilities }
+        local lspconfig = require("lspconfig")
         local mason = require("mason")
         local mason_lspconfig = require("mason-lspconfig")
         local mason_tool_installer = require("mason-tool-installer")
@@ -28,21 +28,21 @@ return {
         local default_capabilities = vim.lsp.protocol.make_client_capabilities()
 
         local server_configs = {
-            	-- place language server names and their configuration here as a key-value pair
-		lua_ls = {
-			settings = {
-				Lua = {
-					completion = {
-						callSnippet = "Replace",
-					},
-					diagnostics = {
-						disable = {
-							"missing-fields"
-						}
-					},
-				},
-			},
-		},
+            -- place language server names and their configuration here as a key-value pair
+            lua_ls = {
+                settings = {
+                    Lua = {
+                        completion = {
+                            callSnippet = "Replace",
+                        },
+                        diagnostics = {
+                            disable = {
+                                "missing-fields"
+                            }
+                        },
+                    },
+                },
+            },
         }
 
         mason.setup()
@@ -50,17 +50,10 @@ return {
         local mason_ensure_installed = vim.tbl_keys(server_configs or {})
         vim.list_extend(
             mason_ensure_installed,
-	        -- place other packages you want to install but not configure with mason here
-            -- e.g. language servers not configured with nvim-lspconfig, linters, formatters, etc.
             {
-                "stylua",
-                "pyright",
-                "pylint",
-                "black",
-                "debugpy",
-                "flake8",
-                "isort",
-                "mypy",
+                -- place other packages you want to install but not configure with mason here
+                -- e.g. language servers not configured with nvim-lspconfig, linters, formatters, etc.
+                "jdtls"
             }
         )
         mason_tool_installer.setup({
@@ -77,10 +70,8 @@ return {
                         server_config.capabilities or {}
                     )
                     lspconfig[server_name].setup(server_config)
-                end
-            },
-            ensure_installed = {
-                'pyright',
+                end,
+                ['jdtls'] = function() end,
             },
         })
 
