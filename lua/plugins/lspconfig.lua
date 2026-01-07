@@ -43,6 +43,7 @@ return {
                     },
                 },
             },
+            ts_ls = {},
         }
 
         mason.setup()
@@ -53,7 +54,9 @@ return {
             {
                 -- place other packages you want to install but not configure with mason here
                 -- e.g. language servers not configured with nvim-lspconfig, linters, formatters, etc.
-                "jdtls"
+                "jdtls",
+                "stylua",
+                "typescript-language-server",
             }
         )
         mason_tool_installer.setup({
@@ -92,6 +95,7 @@ return {
                 keymap("<leader>ws", builtin.lsp_dynamic_workspace_symbols)
                 keymap("<leader>rn", vim.lsp.buf.rename)
                 keymap("<leader>ca", vim.lsp.buf.code_action)
+                keymap("<leader>fd", vim.lsp.buf.format)
                 keymap("K", vim.lsp.buf.hover)
             end
         })
