@@ -1,103 +1,119 @@
 -- ~/.config/nvim/lua/plugins/lspconfig.lua
 return {
-    "neovim/nvim-lspconfig",
-    dependencies = {
-        "williamboman/mason.nvim",
-        "williamboman/mason-lspconfig.nvim",
-        'WhoIsSethDaniel/mason-tool-installer.nvim',
-        {
-            "folke/lazydev.nvim",
-            ft = "lua", -- only load on lua files
-            opts = {
-                library = {
-                    -- Load luvit types when the `vim.uv` word is found
-                    { path = "luvit-meta/library", words = { "vim%.uv" } },
-                },
-            },
+  "neovim/nvim-lspconfig",
+  dependencies = {
+    "williamboman/mason.nvim",
+    "williamboman/mason-lspconfig.nvim",
+    'WhoIsSethDaniel/mason-tool-installer.nvim',
+    {
+      "folke/lazydev.nvim",
+      ft = "lua",       -- only load on lua files
+      opts = {
+        library = {
+          -- Load luvit types when the `vim.uv` word is found
+          { path = "luvit-meta/library", words = { "vim%.uv" } },
         },
-        "mfussenegger/nvim-jdtls",
+      },
     },
+    "mfussenegger/nvim-jdtls",
+  },
 
-    config = function()
-        local lspconfig = require("lspconfig")
-        local mason = require("mason")
-        local mason_lspconfig = require("mason-lspconfig")
-        local mason_tool_installer = require("mason-tool-installer")
+  config = function()
+    local lspconfig = require("lspconfig")
+    local mason = require("mason")
+    local mason_lspconfig = require("mason-lspconfig")
+    local mason_tool_installer = require("mason-tool-installer")
 
 
-        local default_capabilities = vim.lsp.protocol.make_client_capabilities()
+    local default_capabilities = vim.lsp.protocol.make_client_capabilities()
 
-        local server_configs = {
-            -- place language server names and their configuration here as a key-value pair
-            lua_ls = {
-                settings = {
-                    Lua = {
-                        completion = {
-                            callSnippet = "Replace",
-                        },
-                        diagnostics = {
-                            disable = {
-                                "missing-fields"
-                            }
-                        },
-                    },
-                },
+    local server_configs = {
+      -- place language server names and their configuration here as a key-value pair
+      lua_ls = {
+        settings = {
+          Lua = {
+            completion = {
+              callSnippet = "Replace",
             },
-            ts_ls = {},
-        }
-
-        mason.setup()
-
-        local mason_ensure_installed = vim.tbl_keys(server_configs or {})
-        vim.list_extend(
-            mason_ensure_installed,
-            {
-                -- place other packages you want to install but not configure with mason here
-                -- e.g. language servers not configured with nvim-lspconfig, linters, formatters, etc.
-                "jdtls",
-                "stylua",
-                "typescript-language-server",
-            }
-        )
-        mason_tool_installer.setup({
-            ensure_installed = mason_ensure_installed
-        })
-
-        mason_lspconfig.setup({
-            handlers = {
-                function(server_name)
-                    local server_config = server_configs[server_name] or {}
-                    server_config.capabilities = vim.tbl_deep_extend(
-                        "force",
-                        default_capabilities,
-                        server_config.capabilities or {}
-                    )
-                    lspconfig[server_name].setup(server_config)
-                end,
-                ['jdtls'] = function() end,
+            diagnostics = {
+              disable = {
+                "missing-fields"
+              }
             },
-        })
+          },
+        },
+      },
+      pylsp = {
+        settings = {
+          pylsp = {
+            plugins = {
+              pyflakes = { enabled = false },
+              pycodestyle = { enabled = false },
+              autopep8 = { enabled = false },
+              yapf = { enabled = false },
+              mccabe = { enabled = false },
+              pylsp_mypy = { enabled = false },
+              pylsp_black = { enabled = false },
+              pylasp_isort = { enabled = false },
+            },
+          },
+        },
+      },
+      ts_ls = {},
+    }
 
-        vim.api.nvim_create_autocmd("LspAttach", {
-            group = vim.api.nvim_create_augroup("lsp-attach-keybinds", { clear = true }),
-            callback = function(e)
-                local keymap = function(keys, func)
-                    vim.keymap.set("n", keys, func, { buffer = e.buf })
-                end
-                local builtin = require("telescope.builtin")
+    mason.setup()
 
-                keymap("gd", builtin.lsp_definitions)
-                keymap("gD", vim.lsp.buf.declaration)
-                keymap("gr", builtin.lsp_references)
-                keymap("gI", builtin.lsp_implementations)
-                keymap("<leader>D", builtin.lsp_type_definitions)
-                keymap("<leader>ds", builtin.lsp_document_symbols)
-                keymap("<leader>ws", builtin.lsp_dynamic_workspace_symbols)
-                keymap("<leader>rn", vim.lsp.buf.rename)
-                keymap("<leader>ca", vim.lsp.buf.code_action)
-                keymap("<leader>fd", vim.lsp.buf.format)
-                keymap("K", vim.lsp.buf.hover)
-            end
-        })
-    end
+    local mason_ensure_installed = vim.tbl_keys(server_configs or {})
+    vim.list_extend(
+      mason_ensure_installed,
+      {
+        -- place other packages you want to install but not configure with mason here
+        -- e.g. language servers not configured with nvim-lspconfig, linters, formatters, etc.
+        "jdtls",
+        "stylua",
+        "typescript-language-server",
+      }
+    )
+    mason_tool_installer.setup({
+      ensure_installed = mason_ensure_installed
+    })
+
+    mason_lspconfig.setup({
+      handlers = {
+        function(server_name)
+          local server_config = server_configs[server_name] or {}
+          server_config.capabilities = vim.tbl_deep_extend(
+            "force",
+            default_capabilities,
+            server_config.capabilities or {}
+          )
+          lspconfig[server_name].setup(server_config)
+        end,
+        ['jdtls'] = function() end,
+      },
+    })
+
+    vim.api.nvim_create_autocmd("LspAttach", {
+      group = vim.api.nvim_create_augroup("lsp-attach-keybinds", { clear = false }),
+      callback = function(e)
+        local keymap = function(keys, func)
+          vim.keymap.set("n", keys, func, { buffer = e.buf })
+        end
+        local builtin = require("telescope.builtin")
+
+        keymap("gd", builtin.lsp_definitions)
+        keymap("gD", vim.lsp.buf.declaration)
+        keymap("gr", builtin.lsp_references)
+        keymap("gI", builtin.lsp_implementations)
+        keymap("<leader>D", builtin.lsp_type_definitions)
+        keymap("<leader>ds", builtin.lsp_document_symbols)
+        keymap("<leader>ws", builtin.lsp_dynamic_workspace_symbols)
+        keymap("<leader>rn", vim.lsp.buf.rename)
+        keymap("<leader>ca", vim.lsp.buf.code_action)
+        keymap("<leader>fd", vim.lsp.buf.format)
+        keymap("K", vim.lsp.buf.hover)
+      end
+    })
+  end
 }

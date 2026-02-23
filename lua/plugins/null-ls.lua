@@ -1,19 +1,10 @@
 -- ~/.config/lua/plugins/null-ls.lua
 return {
 	"nvimtools/none-ls.nvim",
-	ft = { "python" },
 	dependencies = {
 		"nvimtools/none-ls-extras.nvim",
 		"jayp0521/mason-null-ls.nvim",
 	},
-	opts = function()
-		local null_ls = require("null-ls")
-		null_ls.setup({
-			sources = {
-				null_ls.builtins.diagnostics.mypy,
-			},
-		})
-	end,
 	config = function()
 		local null_ls = require("null-ls")
 		local formatting = null_ls.builtins.formatting -- to setup formatters
@@ -22,23 +13,18 @@ return {
 		-- list of formatters & linters for mason to install
 		require("mason-null-ls").setup({
 			ensure_installed = {
-				"checkmake",
 				"prettier", -- ts/js formatter
-				"eslint_d", -- ts/js linter
 				"shfmt",
 				-- 'stylua', -- lua formatter; Already installed via Mason
-				-- 'ruff', -- Python linter and formatter; Already installed via Mason
+				'ruff', -- Python linter and formatter; Already installed via Mason
 			},
 			-- auto-install configured formatters & linters (with null-ls)
 			automatic_installation = true,
 		})
 
 		local sources = {
-			diagnostics.checkmake,
 			formatting.prettier.with({ filetypes = { "html", "json", "yaml", "markdown" } }),
-			formatting.stylua,
 			formatting.shfmt.with({ args = { "-i", "4" } }),
-			formatting.terraform_fmt,
 			require("none-ls.formatting.ruff").with({ extra_args = { "--extend-select", "I" } }),
 			require("none-ls.formatting.ruff_format"),
 		}
