@@ -12,6 +12,9 @@ return {
         vim.g.loaded_netrwPlugin = 1
 
         nvimtree.setup({
+          hijack_directories = {
+            enable = true,
+          },
           view = {
             width = 50,
             relativenumber = true,
@@ -39,6 +42,9 @@ return {
                 enable = false,
               },
             },
+          },
+          update_focused_file = {
+            enable = true,
           },
           filters = {
             custom = { ".DS_Store" },
