@@ -24,6 +24,7 @@ return {
 
 		local sources = {
 			formatting.prettier.with({ filetypes = { "html", "json", "yaml", "markdown" } }),
+			formatting.stylua.with({ command = "/local/home/markycoo/.local/bin/stylua" }),
 			formatting.shfmt.with({ args = { "-i", "4" } }),
 			require("none-ls.formatting.ruff").with({ extra_args = { "--extend-select", "I" } }),
 			require("none-ls.formatting.ruff_format"),

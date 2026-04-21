@@ -71,7 +71,7 @@ return {
         -- place other packages you want to install but not configure with mason here
         -- e.g. language servers not configured with nvim-lspconfig, linters, formatters, etc.
         "jdtls",
-        "stylua",
+        -- "stylua", -- installed via nix (AL2 glibc too old for Mason binary)
         "typescript-language-server",
       }
     )
